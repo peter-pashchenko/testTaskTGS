@@ -1,0 +1,39 @@
+networks:
+  project_network:
+    driver: bridge
+
+services:
+  imageservice:
+    build:
+      context: .
+      dockerfile: ./deploy/docker-compose/Dockerfile
+    ports:
+      - "${GRPC_PORT}:${GRPC_PORT}"
+    env_file:
+      .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - project_network
+
+
+  postgres:
+    image: postgres:15
+    env_file:
+      .env
+    environment:
+      POSTGRES_USER: "${PG_USER}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD}"
+      POSTGRES_DB: "${PG_DATABASE}"
+    ports:
+      - "${PG_PORT}:${PG_PORT}"
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U template_service" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - project_network
+
+

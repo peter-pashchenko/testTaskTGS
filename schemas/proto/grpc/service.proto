@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package image_service.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package="./internal/generated/grpc/images;image_service_v1";
+
+service imageService{
+  rpc SaveImage(Image) returns (SaveImageReponse);
+  rpc GetByName(Name) returns (Image);
+  rpc ListAll(Empty) returns (ListImages);
+}
+
+message Empty{}
+
+message SaveImageReponse{
+  string status = 1;
+}
+
+message Name{
+  string value=1;
+}
+message Image{
+  string name=1;
+  bytes data=2;
+}
+
+message ImageList{
+  string name=1;
+  google.protobuf.Timestamp created=2;
+  google.protobuf.Timestamp updated=3;
+
+}
+
+message ListImages{
+   repeated ImageList images=1;
+}
+
+
